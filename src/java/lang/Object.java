@@ -26,25 +26,34 @@
 package java.lang;
 
 /**
+ * Object 是所有类的根
+ * 每一个类都将Object作为超类
+ * 包括数组 实现这个类的方法
  * Class {@code Object} is the root of the class hierarchy.
  * Every class has {@code Object} as a superclass. All objects,
  * including arrays, implement the methods of this class.
  *
- * @author  unascribed
+ * @author  unascribed 未署名的
  * @see     java.lang.Class
  * @since   JDK1.0
  */
 public class Object {
 
+    /**
+     * 一个Native Method就是一个java调用非java代码的接口
+     */
     private static native void registerNatives();
     static {
         registerNatives();
     }
 
+
     /**
-     * Returns the runtime class of this {@code Object}. The returned
-     * {@code Class} object is the object that is locked by {@code
-     * static synchronized} methods of the represented class.
+     *
+     * 返回这个Object的当前运行时class对象
+     * Returns the runtime class of this {@code Object}.
+     * 返回的class对象 是线程安全的方法
+     * The returned {@code Class} object is the object that is locked by {@code static synchronized} methods of the represented class.
      *
      * <p><b>The actual result type is {@code Class<? extends |X|>}
      * where {@code |X|} is the erasure of the static type of the
