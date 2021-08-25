@@ -41,8 +41,13 @@ public class Object {
 
     /**
      * 一个Native Method就是一个java调用非java代码的接口
+     * 一个本地方法,具体是用C(C++)在DLL中实现的,然后通过JNI调用
      */
     private static native void registerNatives();
+
+    /**
+     * static{} 静态代码块 包裹起来的代码片段 只会在初始化时执行一次
+     */
     static {
         registerNatives();
     }
@@ -50,7 +55,8 @@ public class Object {
 
     /**
      *
-     * 返回这个Object的当前运行时class对象
+     * 返回这个Object的运行时class对象
+     *
      * Returns the runtime class of this {@code Object}.
      * 返回的class对象 是线程安全的方法
      * The returned {@code Class} object is the object that is locked by {@code static synchronized} methods of the represented class.
@@ -72,9 +78,17 @@ public class Object {
     public final native Class<?> getClass();
 
     /**
-     * Returns a hash code value for the object. This method is
-     * supported for the benefit of hash tables such as those provided by
-     * {@link java.util.HashMap}.
+     * hashCode的常规协定是：
+     * 1.在java应用程序执行期间,在对同一对象多次调用hashCode()方法时,必须一致地返回相同的整数,前提是将对象进行equals比较时所用的信息没有被修改。
+     *   从某一应用程序的一次执行到同一应用程序的另一次执行,该整数无需保持一致。
+     * 2.如果根据equals(object)方法,两个对象是相等的,那么对这两个对象中的每个对象调用hashCode方法都必须生成相同的整数结果。
+     * 3.如果根据equals(java.lang.Object)方法,两个对象不相等,那么对这两个对象中的任一对象上调用hashCode()方法不要求一定生成不同的整数结果。
+     *   但是,程序员应该意识到,为不相等的对象生成不同整数结果可以提高哈希表的性能。
+     *
+     * 返回当前对象的hashCode值
+     * Returns a hash code value for the object.
+     * 由hash表提供支持  比如 hashMap
+     * This method is supported for the benefit of hash tables such as those provided by {@link java.util.HashMap}.
      * <p>
      * The general contract of {@code hashCode} is:
      * <ul>
@@ -109,6 +123,9 @@ public class Object {
     public native int hashCode();
 
     /**
+     *
+     * 直接比较内存地址
+     *
      * Indicates whether some other object is "equal to" this one.
      * <p>
      * The {@code equals} method implements an equivalence relation
@@ -159,8 +176,10 @@ public class Object {
     }
 
     /**
-     * Creates and returns a copy of this object.  The precise meaning
-     * of "copy" may depend on the class of the object. The general
+     * 创建并返回当前对象的复制对象
+     *
+     * Creates and returns a copy of this object.
+     * The precise meaning of "copy" may depend on the class of the object. The general
      * intent is that, for any object {@code x}, the expression:
      * <blockquote>
      * <pre>
@@ -221,6 +240,8 @@ public class Object {
     protected native Object clone() throws CloneNotSupportedException;
 
     /**
+     *
+     * 返回该对象的字符串表示,非常重要的方法
      * Returns a string representation of the object. In general, the
      * {@code toString} method returns a string that
      * "textually represents" this object. The result should
@@ -242,10 +263,14 @@ public class Object {
      * @return  a string representation of the object.
      */
     public String toString() {
+        // getClass().getName();获取字节码文件的对应全路径名例如java.lang.Object
+        // Integer.toHexString(hashCode());将哈希值转成16进制数格式的字符串。
         return getClass().getName() + "@" + Integer.toHexString(hashCode());
     }
 
     /**
+     *
+     * 不能被重写，用于唤醒一个在因等待该对象（调用了wait方法）被处于等待状态（waiting 或 time_wait）的线程，该方法只能同步方法或同步块中调用
      * Wakes up a single thread that is waiting on this object's
      * monitor. If any threads are waiting on this object, one of them
      * is chosen to be awakened. The choice is arbitrary and occurs at
@@ -280,6 +305,9 @@ public class Object {
     public final native void notify();
 
     /**
+     *
+     * 不能被重写，用于唤醒所有在因等待该对象（调用wait方法）被处于等待状态（waiting或time_waiting）的线程，该方法只能同步方法或同步块中调用
+     *
      * Wakes up all threads that are waiting on this object's monitor. A
      * thread waits on an object's monitor by calling one of the
      * {@code wait} methods.
@@ -304,6 +332,9 @@ public class Object {
     public final native void notifyAll();
 
     /**
+     *
+     * 不能被重写，用于在线程调用中，使当前线程进入等待状态（time_waiting)，timeout单位为毫秒,该方法只能同步方法或同步块中调用,超过设置时间后线程重新进入可运行状态
+     *
      * Causes the current thread to wait until either another thread invokes the
      * {@link java.lang.Object#notify()} method or the
      * {@link java.lang.Object#notifyAll()} method for this object, or a
@@ -512,6 +543,9 @@ public class Object {
     }
 
     /**
+     *
+     * 这个方法用于当对象被回收时调用，这个由JVM支持，Object的finalize方法默认是什么都没有做，如果子类需要在对象被回收时执行一些逻辑处理，则可以重写finalize方法
+     *
      * Called by the garbage collector on an object when garbage collection
      * determines that there are no more references to the object.
      * A subclass overrides the {@code finalize} method to dispose of
